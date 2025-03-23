@@ -3,241 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ростелеком - Подключите Интернет!</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f2f2f2; /* Светло-серый фон */
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        header {
-            text-align: center;
-            padding: 20px 0;
-            background-color: #e0d0ff; /* Light purple */
-        }
-
-        h1 {
-            color: #7940a3; /* Dark purple */
-        }
-
-        .tariffs {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-        }
-
-        .tariff-card {
-            background-color: #f0f0f0; /* Light gray for cards */
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .tariff-card:hover {
-            transform: scale(1.05);
-        }
-
-        .tariff-card h3 {
-            color: #7940a3;
-            margin-bottom: 5px;
-        }
-
-        .tariff-card p {
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .tariff-card .price {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .advantages {
-            margin-bottom: 30px;
-        }
-
-        .advantages ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .advantages li {
-            margin-bottom: 10px;
-        }
-
-        .google-form {
-            width: 100%;
-            height: 500px; /* Adjust the height */
-            border: none;
-        }
-
-        /* Add more styles as needed */
-        .rostelecom-button {
-            background-color: #7940a3; /* Purple */
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .rostelecom-button:hover {
-            background-color: #5e2b7a; /* Darker purple */
-        }
-
-        /* Mimic Rostelecom colors (adapt based on brand guidelines) */
-        .rostelecom-text-purple {
-            color: #7940a3; /* Purple used in their branding */
-        }
-
-        .rostelecom-bg-purple {
-            background-color: #e0d0ff; /* Light purple */
-        }
-
-        /* Styles for the Modal (Popup) */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
+    <meta name="description" content="Тарифы Ростелеком. Выберите подходящий тариф для дома и мобильной связи.">
+    <meta name="keywords" content="Ростелеком, тарифы, интернет, телевидение, мобильная связь">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>Тарифы Ростелеком</title>
 </head>
 <body>
-
-<div class="container">
-    <header class="rostelecom-bg-purple">
-        <h1>Подключите Интернет от Ростелеком</h1>
-        <p>Выгодные тарифы и быстрое подключение!</p>
+    <header>
+        <img src="https://png.klev.club/uploads/posts/2024-04/png-klev-club-huec-p-rostelekom-logotip-png-9.png" alt="Ростелеком лого" class="logo">
+        <h1>Ростелеком</h1>
+        <p>Спасибо, что выбрали Ростелеком</p>
     </header>
+    <main>
+        <section class="tariffs-container">
+            <div class="arrow left-arrow" onclick="prevCard()">&#10094;</div>
+            <div class="tariffs">
+                <!-- Семейный тариф -->
+                <div class="tariff active" data-index="0" onclick="selectTariff('Семейный тариф', 'Первые 60 дней скидка 50%, далее 1100₽', 'Технологии выгоды. Семейный')">
+                    <div class="tariff-label">Выгода до 60%🔥</div> <!-- Новая надпись -->
+                    <h2>Семейный тариф</h2>
+                    <p>Технологии выгоды. Семейный</p>
+                    <p>500 Мбит/с</p>
+                    <p>222 канала + 27 000 фильмов и сериалов от Wink</p>
+                    <p>От 3-х до 5-ти сим-карт, 40 ГБ Интернета, 2000 Минут, БЕЗЛИМИТ на Соц.сети</p>
+                    <p class="price"><span class="old-price">1100₽</span> 550₽</p>
+                    <p>Скидка 50% на первые 60 дней!</p>
+                </div>
 
-    <section class="tariffs">
-        <div class="tariff-card" data-tariff="Домашний Интернет">
-            <h3>Домашний Интернет</h3>
-            <p>Скидка 50% на 60 дней</p>
-            <p class="price">300 ₽/мес</p>
-        </div>
+                <!-- Комбо 3 в 1 -->
+                <div class="tariff" data-index="1" onclick="selectTariff('С ТВ и мобильной связью', 'Цена фиксируется НАВСЕГДА', 'Технологии выгоды. Комбо 3 в 1')">
+                    <div class="tariff-label">Выгода до 60%🔥</div> <!-- Новая надпись -->
+                    <h2>С ТВ и мобильной связью</h2>
+                    <p>Технологии выгоды. Комбо 3 в 1</p>
+                    <p>100 Мбит/с</p>
+                    <p>222 канала + 27 000 фильмов и сериалов от Wink</p>
+                    <p>40 ГБ Интернета, 1000 Минут на звонки, БЕЗЛИМИТ на Соц.сети</p>
+                    <p class="price">850₽</p>
+                    <p>Стоимость тарифа фиксируется НАВСЕГДА!</p>
+                </div>
 
-        <div class="tariff-card" data-tariff="Интернет + ТВ">
-            <h3>Интернет + ТВ</h3>
-            <p>Скидка 30% на 90 дней</p>
-            <p class="price">595 ₽/мес</p>
-        </div>
+                <!-- Интернет + ТВ -->
+                <div class="tariff" data-index="2" onclick="selectTariff('С телевидением', 'Первые 60 дней скидка 50%, далее 700₽', 'Технологии развлечения. Хит сезона S')">
+                    <h2>С телевидением</h2>
+                    <p>Технологии развлечения. Хит сезона S</p>
+                    <p>100 Мбит/с</p>
+                    <p>222 канала + 27 000 фильмов и сериалов от Wink</p>
+                    <p class="price"><span class="old-price">700₽</span> 350₽</p>
+                    <p>Скидка 50% на первые 60 дней!</p>
+                </div>
 
-        <div class="tariff-card" data-tariff="Игровой Тариф">
-            <h3>Игровой Тариф</h3>
-            <p>Самый быстрый интернет!</p>
-            <p class="price">950 ₽/мес</p>
-        </div>
-    </section>
+                <!-- Просто интернет -->
+                <div class="tariff" data-index="3" onclick="selectTariff('Домашний интернет', 'Первые 60 дней скидка 50%, далее 600₽', 'Технологии доступа. Хит сезона S')">
+                    <h2>Домашний интернет</h2>
+                    <p>Технологии доступа. Хит сезона S</p>
+                    <p>100 Мбит/с</p>
+                    <p>Бесплатный интернет</p>
+                    <p class="price"><span class="old-price">600₽</span> 300₽</p>
+                    <p>Скидка 50% на первые 60 дней!</p>
+                </div>
+            </div>
+            <div class="arrow right-arrow" onclick="nextCard()">&#10095;</div>
+        </section>
 
-    <section class="advantages">
-        <h2>Преимущества Ростелеком</h2>
-        <ul>
-            <li>Высокая скорость интернета</li>
-            <li>Надежное подключение</li>
-            <li>Техподдержка 24/7</li>
-            <li>Выгодные тарифы</li>
-        </ul>
-    </section>
+        <section class="application-form">
+            <h2>Отправьте заявку</h2>
+            <p>Наш специалист свяжется с Вами в ближайшее время.</p>
+            <form class="form-container" onsubmit="submitForm(event)">
+                <label for="tariff">Выбранный тариф:</label>
+                <input type="text" id="tariff" readonly>
+                <label for="address">Город, улица, дом, квартира:</label>
+                <input type="text" id="address" required>
+                <label for="name">Как вас зовут?</label>
+                <input type="text" id="name" required>
+                <label for="phone">Мобильный телефон:</label>
+                <input type="tel" id="phone" required>
+                <button type="submit">Подключить</button>
+            </form>
+            <p class="privacy-policy">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a> ПАО «Ростелеком».</p>
+        </section>
+    </main>
 
-    <!-- The Modal (Popup) -->
-    <div id="myModal" class="modal">
-
-        <!-- Modal content -->
+    <!-- Модальное окно для уведомления -->
+    <div id="successModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Оставьте заявку на подключение</h2>
-            <p>Вы выбрали тариф: <span id="selected-tariff"></span></p>
-            <!-- Replace with a Form here -->
-            <form>
-                <label for="name">Имя:</label><br>
-                <input type="text" id="name" name="name"><br><br>
-
-                <label for="phone">Телефон:</label><br>
-                <input type="tel" id="phone" name="phone"><br><br>
-
-                <input type="submit" value="Отправить">
-            </form>
-            <p><small>Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности ПАО «Ростелеком»</small></p>
+            <p>Ваша заявка успешно отправлена!</p>
         </div>
-
     </div>
-</div>
 
-<script>
-    // Get the modal
-    var modal = document.getElementById("myModal");
-
-    // Get all tariff cards
-    var tariffCards = document.querySelectorAll(".tariff-card");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    // Get the span element that holds the selected tariff
-    var selectedTariff = document.getElementById("selected-tariff");
-
-    // When the user clicks on a tariff card, open the modal
-    tariffCards.forEach(function(card) {
-        card.onclick = function() {
-            modal.style.display = "block";
-            selectedTariff.textContent = card.dataset.tariff;
-        }
-    });
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-</script>
-
+    <footer>
+        <p class="sales-phone">Менеджер по продажам: <span class="phone-number">+7 (991) 424-23-37</span></p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
