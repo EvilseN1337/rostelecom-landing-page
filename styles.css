@@ -45,8 +45,8 @@ header {
 }
 
 .tariff {
-    background: linear-gradient(135deg, #6a1b9a, #4a148c); /* Градиент в фиолетовых тонах */
-    color: #ffffff; /* Белый текст для контраста */
+    background: linear-gradient(135deg, #6a1b9a, #4a148c);
+    color: #ffffff;
     border-radius: 10px;
     padding: 20px;
     width: 250px;
@@ -58,7 +58,7 @@ header {
     display: none;
     opacity: 0;
     transform: translateY(20px);
-    position: relative; /* Для позиционирования текста поверх карточки */
+    position: relative;
 }
 
 .tariff.active {
@@ -70,12 +70,12 @@ header {
 .tariff:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(135deg, #4a148c, #6a1b9a); /* Градиент при наведении */
+    background: linear-gradient(135deg, #4a148c, #6a1b9a);
 }
 
 .tariff h2 {
     font-family: 'Roboto', Arial, sans-serif;
-    color: #ffffff; /* Белый текст для заголовков */
+    color: #ffffff;
     font-size: 24px;
     margin-bottom: 10px;
 }
@@ -84,46 +84,44 @@ header {
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 16px;
     margin: 5px 0;
-    color: #f0f0f0; /* Светло-серый текст для контента */
+    color: #f0f0f0;
 }
 
 .price {
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 28px;
     font-weight: bold;
-    color: #ff5722; /* Оранжевый цвет для цены */
+    color: #ff5722;
     margin-top: 15px;
 }
 
 .old-price {
     text-decoration: line-through;
-    color: #ccc; /* Светло-серый цвет для старой цены */
+    color: #ccc;
     margin-right: 10px;
 }
 
-/* Стили для новой надписи "Выгода до 60%🔥" */
 .tariff-label {
     text-align: center;
     font-weight: bold;
     margin-bottom: 10px;
-    color: #ffffff; /* Белый цвет */
-    font-size: 18px; /* Увеличиваем размер шрифта */
-    position: absolute; /* Размещаем текст поверх карточки */
-    top: 10px; /* Отступ сверху */
-    left: 50%; /* Центрируем по горизонтали */
-    transform: translateX(-50%); /* Центрируем по горизонтали */
-    z-index: 1; /* Размещаем текст поверх карточки */
-    white-space: nowrap; /* Текст не переносится на новую строку */
+    color: #ffffff;
+    font-size: 18px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    white-space: nowrap;
 }
 
-/* Изменение цвета стрелок на градиентный оранжевый */
 .arrow {
     cursor: pointer;
     font-size: 40px;
-    background: linear-gradient(135deg, #ff5722, #e64a19); /* Градиентный оранжевый */
+    background: linear-gradient(135deg, #ff5722, #e64a19);
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent; /* Делаем текст прозрачным, чтобы отображался градиент */
+    color: transparent;
     user-select: none;
     position: absolute;
     top: 50%;
@@ -132,7 +130,7 @@ header {
 }
 
 .arrow:hover {
-    opacity: 0.8; /* Легкое затемнение при наведении */
+    opacity: 0.8;
 }
 
 .left-arrow {
@@ -247,7 +245,7 @@ footer {
 }
 
 footer p {
-    margin: 5px 0; /* Добавляем отступы между строками */
+    margin: 5px 0;
 }
 
 .sales-phone {
@@ -259,7 +257,6 @@ footer p {
     font-weight: bold;
 }
 
-/* Модальное окно */
 .modal {
     display: none;
     position: fixed;
@@ -290,7 +287,25 @@ footer p {
     color: #333;
 }
 
-/* Мобильная версия */
+.select-button {
+    font-family: 'Roboto', Arial, sans-serif;
+    padding: 10px;
+    background: linear-gradient(135deg, #ff5722, #e64a19);
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.select-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 768px) {
     .tariff {
         width: 100%;
@@ -337,4 +352,4 @@ footer p {
     .phone-number {
         font-size: 20px;
     }
-}
+    }
