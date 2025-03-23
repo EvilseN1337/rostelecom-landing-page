@@ -33,6 +33,15 @@ function prevCard() {
 
 function selectTariff(tariff, discount, description) {
     document.getElementById("tariff").value = `${tariff} - ${discount} (${description})`;
+
+    // Прокрутка только для мобильной версии
+    if (window.innerWidth <= 768) {
+        const formSection = document.getElementById("application-form");
+        formSection.scrollIntoView({
+            behavior: "smooth", // Плавная прокрутка
+            block: "start"       // Прокрутка до начала элемента
+        });
+    }
 }
 
 function submitForm(event) {
@@ -40,16 +49,13 @@ function submitForm(event) {
     const modal = document.getElementById('successModal');
     modal.style.display = 'flex';
 
-    // Закрытие модального окна через 3 секунды
     setTimeout(() => {
         modal.style.display = 'none';
     }, 3000);
 }
 
-// Закрытие модального окна при клике на крестик
 document.querySelector('.close').addEventListener('click', () => {
     document.getElementById('successModal').style.display = 'none';
 });
 
-// Показываем первые карточки при загрузке страницы
 showCard(currentIndex);
