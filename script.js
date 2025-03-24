@@ -1,7 +1,7 @@
 let currentIndex = 0;
 const cards = document.querySelectorAll('.tariff');
 
-// Функции для переключения тарифов (остаются без изменений)
+// Функции для переключения тарифов
 function showCard(index) {
     const isMobile = window.innerWidth <= 768;
     const cardsToShow = isMobile ? 1 : 3;
@@ -44,7 +44,20 @@ function selectTariff(tariff, discount, description) {
     }
 }
 
-// ОБНОВЛЕННАЯ Функция отправки формы
+// Проверка доступности GAS (CORS preflight)
+async function checkGASAccess() {
+    try {
+        const testResponse = await fetch('https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec?ping=1', {
+            method: 'GET',
+            mode: 'no-cors'
+        });
+        console.log('GAS доступен для запросов');
+    } catch (error) {
+        console.warn('Проблема с доступом к GAS:', error);
+    }
+}
+
+// ОБНОВЛЕННАЯ Функция отправки формы с полной обработкой CORS
 async function submitForm(event) {
     event.preventDefault();
     
@@ -55,17 +68,25 @@ async function submitForm(event) {
         phone: document.getElementById("phone").value
     };
 
+    // Ваш новый URL GAS
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
+    
+    // Показываем loader (добавьте элемент с id="loader" в HTML)
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'block';
+
     try {
-        // Ваш URL из Google Apps Script
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzzInTg3LnQAdYIendesGlqn8rT4RPdXW_DARa1fqunWSG-twudL8PUJTfX-FBhrYOP/exec";
-        
         const response = await fetch(GAS_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(formData),
+            mode: "cors"
         });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const result = await response.json();
         
@@ -77,14 +98,22 @@ async function submitForm(event) {
             modal.style.display = 'none';
         }, 3000);
 
-        // Очищаем форму (опционально)
+        // Очищаем форму
         document.getElementById("address").value = "";
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
 
     } catch (error) {
         console.error("Ошибка при отправке:", error);
-        alert("Произошла ошибка. Пожалуйста, попробуйте позже.");
+        alert("Произошла ошибка. Пожалуйста, попробуйте позже или свяжитесь с нами через Telegram.");
+        
+        // Дублируем заявку в Telegram через резервный метод
+        const backupUrl = `https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${encodeURIComponent(
+            `❗Резервная заявка!\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`
+        )}`;
+        fetch(backupUrl).catch(e => console.error('Ошибка резервной отправки:', e));
+    } finally {
+        if (loader) loader.style.display = 'none';
     }
 }
 
@@ -95,3 +124,4 @@ document.querySelector('.close').addEventListener('click', () => {
 
 // Инициализация
 showCard(currentIndex);
+checkGASAccess(); // Проверяем доступность GAS при загрузке страницы
