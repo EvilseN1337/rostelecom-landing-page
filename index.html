@@ -10,11 +10,13 @@
     <title>Тарифы Ростелеком</title>
 </head>
 <body>
-    <header>
-       
-        <h1>Ростелеком</h1>
-        <p>Спасибо, что выбрали Ростелеком</p>
-    </header>
+<header>
+    <h1>Ростелеком</h1>
+    <p class="region-info">Подключение Интернета по всей Ростовской области!</p>
+    <p class="sales-phone-header">Менеджер по продажам:</p>
+    <p class="phone-number-header"><a href="tel:+79914242337">+7 (991) 424-23-37</a></p>
+    <p>Спасибо, что выбрали Ростелеком</p>
+</header>
     <main>
         <section class="tariffs-container">
             <div class="arrow left-arrow" onclick="prevCard()">&#10094;</div>
@@ -76,15 +78,15 @@
             <form class="form-container" onsubmit="submitForm(event)">
                 <label for="tariff">Выбранный тариф:</label>
                 <input type="text" id="tariff" readonly>
-                <label for="address">Город, улица, дом, квартира:</label>
+                <label for="address">Населенный пункт, улица, дом, квартира (если есть):</label>
                 <input type="text" id="address" required>
-                <label for="name">Как вас зовут?</label>
+                <label for="name">Как Вас зовут?</label>
                 <input type="text" id="name" required>
                 <label for="phone">Мобильный телефон:</label>
                 <input type="tel" id="phone" required>
                 <button type="submit">Подключить</button>
             </form>
-            <p class="privacy-policy">Нажимая кнопку, вы соглашаетесь с <a href="#">политикой конфиденциальности</a> ПАО «Ростелеком».</p>
+            <!-- Удалена строка с политикой конфиденциальности -->
         </section>
     </main>
 
@@ -97,7 +99,8 @@
     </div>
 
     <footer>
-        <p class="sales-phone">Менеджер по продажам: <span class="phone-number">+7 (991) 424-23-37</span></p>
+        <p class="sales-phone">Менеджер по продажам: <a href="tel:+79914242337">+7 (991) 424-23-37</a></p>
+        <p class="disclaimer">Данный сайт не является официальным сайтом компании Ростелеком.</p>
     </footer>
     <script src="script.js"></script>
 </body>
