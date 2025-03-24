@@ -57,12 +57,22 @@ async function checkGASAccess() {
     }
 }
 
-// Функция отправки формы с защитой от дублирования
+// Функция отправки формы
 async function submitForm(event) {
     event.preventDefault();
     
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const phoneInput = document.getElementById("phone");
+    
+    // Валидация телефона
+    if (!/^[\d\+]{10,15}$/.test(phoneInput.value)) {
+        alert('Пожалуйста, введите корректный номер телефона (минимум 10 цифр)');
+        phoneInput.focus();
+        return false;
+    }
+
     // Блокируем кнопку отправки
-    const submitBtn = event.target.querySelector('button[type="submit"]');
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Отправка...';
@@ -75,82 +85,75 @@ async function submitForm(event) {
         phone: document.getElementById("phone").value
     };
 
-    const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
-
-    // Генерируем уникальный хеш данных формы
-    const formDataHash = btoa(JSON.stringify(formData)).substring(0, 32);
-    const lastSubmissionHash = sessionStorage.getItem('lastSubmissionHash');
-    
-    // Если хеш совпадает с предыдущей отправкой - игнорируем
-    if (lastSubmissionHash === formDataHash) {
-        if (loader) loader.style.display = 'none';
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Подключить';
-        }
-        return;
-    }
-
     try {
-        // 1. Пытаемся отправить через GAS
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
-        const gasResponse = await fetch(GAS_URL, {
+        // 1. Пытаемся отправить через Telegram
+        const telegramMessage = `📌 Новая заявка Ростелеком\n\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`;
+        
+        const telegramResponse = await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-            mode: "cors"
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: "968338148",
+                text: telegramMessage
+            })
         });
 
-        if (gasResponse.ok) {
-            // Сохраняем хеш успешной отправки
-            sessionStorage.setItem('lastSubmissionHash', formDataHash);
+        if (telegramResponse.ok) {
             showSuccess();
-            return;
+        } else {
+            throw new Error('Telegram API error');
         }
     } catch (error) {
-        console.log("Ошибка GAS:", error);
-    }
-
-    // 2. Если GAS не сработал - пробуем Telegram (только если еще не отправляли)
-    if (lastSubmissionHash !== formDataHash) {
+        console.error("Ошибка Telegram:", error);
+        
+        // 2. Если Telegram не сработал - пробуем GAS
         try {
-            await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
-                encodeURIComponent(`📌 Заявка\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
-            }`);
-            
-            // Сохраняем хеш успешной отправки
-            sessionStorage.setItem('lastSubmissionHash', formDataHash);
-            showSuccess();
-        } catch (error) {
-            console.error("Ошибка Telegram:", error);
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
+            const gasResponse = await fetch(GAS_URL, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(formData).toString(),
+                mode: "no-cors"
+            });
+
+            if (gasResponse.ok || gasResponse.status === 0) {
+                showSuccess();
+            } else {
+                throw new Error('GAS error');
+            }
+        } catch (gasError) {
+            console.error("Ошибка GAS:", gasError);
             showError();
         }
-    } else {
-        showSuccess();
     }
 
     function showSuccess() {
         const modal = document.getElementById('successModal');
         if (modal) {
             modal.style.display = 'flex';
-            setTimeout(() => modal.style.display = 'none', 5000); // Увеличено время показа до 5 секунд
-        }
-        
-        document.getElementById("address").value = "";
-        document.getElementById("name").value = "";
-        document.getElementById("phone").value = "";
-        
-        if (loader) loader.style.display = 'none';
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Подключить';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                resetForm();
+            }, 5000);
         }
     }
 
     function showError() {
-        alert("Произошла ошибка. Пожалуйста, позвоните нам напрямую.");
-        if (loader) loader.style.display = 'none';
+        alert("Произошла ошибка при отправке. Пожалуйста, позвоните нам напрямую по номеру +7 (991) 424-23-37");
+        resetForm();
+    }
+
+    function resetForm() {
+        // Очищаем форму, кроме тарифа
+        document.getElementById("address").value = "";
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        
+        // Восстанавливаем кнопку
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Подключить';
@@ -161,6 +164,11 @@ async function submitForm(event) {
 // Закрытие модального окна
 document.querySelector('.close').addEventListener('click', () => {
     document.getElementById('successModal').style.display = 'none';
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Подключить';
+    }
 });
 
 // Инициализация
