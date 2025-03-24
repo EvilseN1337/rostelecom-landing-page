@@ -304,10 +304,18 @@ footer p {
 
 .modal-content {
     background-color: #fff;
-    padding: 20px;
+    padding: 30px;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 350px;
+    width: 90%;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-content .close {
@@ -336,6 +344,14 @@ footer p {
 .select-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.manager-info {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    color: #6a1b9a;
+    margin-top: 10px;
+    font-weight: 500;
 }
 
 @media (max-width: 768px) {
@@ -384,4 +400,4 @@ footer p {
     .phone-number {
         font-size: 20px;
     }
-    }
+        }
