@@ -57,7 +57,7 @@ async function checkGASAccess() {
     }
 }
 
-// ОБНОВЛЕННАЯ Функция отправки формы с полной обработкой CORS
+// Улучшенная функция отправки формы с полной обработкой
 async function submitForm(event) {
     event.preventDefault();
     
@@ -68,60 +68,75 @@ async function submitForm(event) {
         phone: document.getElementById("phone").value
     };
 
-    // Ваш новый URL GAS
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
-    
-    // Показываем loader (добавьте элемент с id="loader" в HTML)
+    // Показываем loader
     const loader = document.getElementById('loader');
     if (loader) loader.style.display = 'block';
 
     try {
-        const response = await fetch(GAS_URL, {
+        // Основная отправка через GAS
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
+        const gasPromise = fetch(GAS_URL, {
             method: "POST",
-            headers: {
+            headers: { 
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json" 
             },
             body: JSON.stringify(formData),
             mode: "cors"
         });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        // Резервная отправка в Telegram
+        const telegramBackup = () => fetch(
+            `https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
+                encodeURIComponent(`❗Резервная заявка!\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
+            }`
+        );
 
-        const result = await response.json();
-        
-        // Показываем уведомление об успехе
+        // Ожидаем ответ с таймаутом
+        const response = await Promise.race([
+            gasPromise.then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+        ]);
+
+        // Успешная обработка
         const modal = document.getElementById('successModal');
-        modal.style.display = 'flex';
-        
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 3000);
-
-        // Очищаем форму
-        document.getElementById("address").value = "";
-        document.getElementById("name").value = "";
-        document.getElementById("phone").value = "";
+        if (modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.display = 'none', 3000);
+        }
 
     } catch (error) {
         console.error("Ошибка при отправке:", error);
-        alert("Произошла ошибка. Пожалуйста, попробуйте позже или свяжитесь с нами через Telegram.");
-        
-        // Дублируем заявку в Telegram через резервный метод
-        const backupUrl = `https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${encodeURIComponent(
-            `❗Резервная заявка!\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`
-        )}`;
-        fetch(backupUrl).catch(e => console.error('Ошибка резервной отправки:', e));
+        // Выполняем резервную отправку
+        await telegramBackup().catch(e => console.error('Ошибка резервной отправки:', e));
     } finally {
+        // Очистка формы
+        document.getElementById("address").value = "";
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        
+        // Скрываем loader
         if (loader) loader.style.display = 'none';
     }
 }
 
 // Закрытие модального окна
 document.querySelector('.close').addEventListener('click', () => {
-    document.getElementById('successModal').style.display = 'none';
+    const modal = document.getElementById('successModal');
+    if (modal) modal.style.display = 'none';
 });
 
 // Инициализация
-showCard(currentIndex);
-checkGASAccess(); // Проверяем доступность GAS при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    showCard(currentIndex);
+    checkGASAccess();
+    
+    // Назначение обработчика формы
+    const form = document.getElementById('application-form');
+    if (form) {
+        form.addEventListener('submit', submitForm);
+    }
+});
