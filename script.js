@@ -1,7 +1,7 @@
 let currentIndex = 0;
 const cards = document.querySelectorAll('.tariff');
 
-// Функции для переключения тарифов (без изменений)
+// Функции для переключения тарифов
 function showCard(index) {
     const isMobile = window.innerWidth <= 768;
     const cardsToShow = isMobile ? 1 : 3;
@@ -44,7 +44,7 @@ function selectTariff(tariff, discount, description) {
     }
 }
 
-// Проверка доступности GAS (без изменений)
+// Проверка доступности GAS
 async function checkGASAccess() {
     try {
         const testResponse = await fetch('https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec?ping=1', {
@@ -134,7 +134,7 @@ async function submitForm(event) {
         const modal = document.getElementById('successModal');
         if (modal) {
             modal.style.display = 'flex';
-            setTimeout(() => modal.style.display = 'none', 3000);
+            setTimeout(() => modal.style.display = 'none', 5000); // Увеличено время показа до 5 секунд
         }
         
         document.getElementById("address").value = "";
@@ -158,11 +158,11 @@ async function submitForm(event) {
     }
 }
 
-// Закрытие модального окна (без изменений)
+// Закрытие модального окна
 document.querySelector('.close').addEventListener('click', () => {
     document.getElementById('successModal').style.display = 'none';
 });
 
-// Инициализация (без изменений)
+// Инициализация
 showCard(currentIndex);
 checkGASAccess();
