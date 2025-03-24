@@ -57,10 +57,17 @@ async function checkGASAccess() {
     }
 }
 
-// ФИНАЛЬНАЯ исправленная функция отправки формы
+// Функция отправки формы с защитой от дублирования
 async function submitForm(event) {
     event.preventDefault();
     
+    // Блокируем кнопку отправки
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Отправка...';
+    }
+
     const formData = {
         tariff: document.getElementById("tariff").value,
         address: document.getElementById("address").value,
@@ -71,12 +78,22 @@ async function submitForm(event) {
     const loader = document.getElementById('loader');
     if (loader) loader.style.display = 'block';
 
-    // Создаем уникальный идентификатор для этой отправки
-    const submissionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('lastSubmissionId', submissionId);
+    // Генерируем уникальный хеш данных формы
+    const formDataHash = btoa(JSON.stringify(formData)).substring(0, 32);
+    const lastSubmissionHash = sessionStorage.getItem('lastSubmissionHash');
+    
+    // Если хеш совпадает с предыдущей отправкой - игнорируем
+    if (lastSubmissionHash === formDataHash) {
+        if (loader) loader.style.display = 'none';
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Подключить';
+        }
+        return;
+    }
 
     try {
-        // 1. Сначала пробуем отправить через GAS
+        // 1. Пытаемся отправить через GAS
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
         const gasResponse = await fetch(GAS_URL, {
             method: "POST",
@@ -85,9 +102,35 @@ async function submitForm(event) {
             mode: "cors"
         });
 
-        if (!gasResponse.ok) throw new Error('GAS response not OK');
+        if (gasResponse.ok) {
+            // Сохраняем хеш успешной отправки
+            sessionStorage.setItem('lastSubmissionHash', formDataHash);
+            showSuccess();
+            return;
+        }
+    } catch (error) {
+        console.log("Ошибка GAS:", error);
+    }
 
-        // Если GAS сработал - просто завершаем
+    // 2. Если GAS не сработал - пробуем Telegram (только если еще не отправляли)
+    if (lastSubmissionHash !== formDataHash) {
+        try {
+            await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
+                encodeURIComponent(`📌 Заявка\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
+            }`);
+            
+            // Сохраняем хеш успешной отправки
+            sessionStorage.setItem('lastSubmissionHash', formDataHash);
+            showSuccess();
+        } catch (error) {
+            console.error("Ошибка Telegram:", error);
+            showError();
+        }
+    } else {
+        showSuccess();
+    }
+
+    function showSuccess() {
         const modal = document.getElementById('successModal');
         if (modal) {
             modal.style.display = 'flex';
@@ -98,33 +141,20 @@ async function submitForm(event) {
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
         
-    } catch (error) {
-        console.log("Ошибка GAS, пробуем Telegram (однократно)");
-        
-        // 2. Проверяем, не отправляли ли мы уже это в Telegram
-        const lastId = localStorage.getItem('lastSubmissionId');
-        if (lastId === submissionId) {
-            try {
-                await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
-                    encodeURIComponent(`📌 Заявка\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
-                }`);
-                
-                const modal = document.getElementById('successModal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    setTimeout(() => modal.style.display = 'none', 3000);
-                }
-                
-                document.getElementById("address").value = "";
-                document.getElementById("name").value = "";
-                document.getElementById("phone").value = "";
-            } catch (e) {
-                console.error("Ошибка Telegram:", e);
-                alert("Произошла ошибка. Пожалуйста, позвоните нам напрямую.");
-            }
-        }
-    } finally {
         if (loader) loader.style.display = 'none';
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Подключить';
+        }
+    }
+
+    function showError() {
+        alert("Произошла ошибка. Пожалуйста, позвоните нам напрямую.");
+        if (loader) loader.style.display = 'none';
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Подключить';
+        }
     }
 }
 
@@ -136,4 +166,3 @@ document.querySelector('.close').addEventListener('click', () => {
 // Инициализация (без изменений)
 showCard(currentIndex);
 checkGASAccess();
-
