@@ -16,6 +16,44 @@ header {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+.region-info {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-top: 10px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sales-phone-header {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: center;
+    color: #ffcc00;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.phone-number-header {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.phone-number-header a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.phone-number-header a:hover {
+    color: #ff5722;
+}
+
 .logo {
     display: none;
     position: absolute;
@@ -214,23 +252,6 @@ header {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.privacy-policy {
-    font-family: 'Roboto', Arial, sans-serif;
-    font-size: 14px;
-    color: #666;
-    margin-top: 10px;
-}
-
-.privacy-policy a {
-    color: #6a1b9a;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.privacy-policy a:hover {
-    color: #4a148c;
-}
-
 footer {
     font-family: 'Roboto', Arial, sans-serif;
     background: linear-gradient(135deg, #6a1b9a, #4a148c);
@@ -252,9 +273,20 @@ footer p {
     font-size: 16px;
 }
 
-.phone-number {
-    font-size: 20px;
-    font-weight: bold;
+.sales-phone a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.sales-phone a:hover {
+    color: #ff5722;
+}
+
+.disclaimer {
+    font-size: 12px;
+    color: #ccc;
+    margin-top: 5px;
 }
 
 .modal {
