@@ -57,7 +57,7 @@ async function checkGASAccess() {
     }
 }
 
-// ИСПРАВЛЕННАЯ функция отправки формы (без дублирования в Telegram)
+// ФИНАЛЬНАЯ исправленная функция отправки формы
 async function submitForm(event) {
     event.preventDefault();
     
@@ -71,11 +71,12 @@ async function submitForm(event) {
     const loader = document.getElementById('loader');
     if (loader) loader.style.display = 'block';
 
-    let sendSuccess = false;
-    let telegramSent = false; // Флаг для контроля однократной отправки в Telegram
+    // Создаем уникальный идентификатор для этой отправки
+    const submissionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('lastSubmissionId', submissionId);
 
     try {
-        // 1. Пытаемся отправить через GAS (основной способ)
+        // 1. Сначала пробуем отправить через GAS
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec";
         const gasResponse = await fetch(GAS_URL, {
             method: "POST",
@@ -84,43 +85,46 @@ async function submitForm(event) {
             mode: "cors"
         });
 
-        if (gasResponse.ok) {
-            sendSuccess = true;
-        }
-    } catch (error) {
-        console.log("Ошибка GAS, пробуем Telegram");
-    }
+        if (!gasResponse.ok) throw new Error('GAS response not OK');
 
-    // 2. Если GAS не сработал и Telegram еще не отправлялся
-    if (!sendSuccess && !telegramSent) {
-        try {
-            await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
-                encodeURIComponent(`📌 Заявка\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
-            }`);
-            sendSuccess = true;
-            telegramSent = true; // Помечаем, что Telegram уже отправлен
-        } catch (error) {
-            console.error("Ошибка Telegram:", error);
-        }
-    }
-
-    // 3. Всегда скрываем loader
-    if (loader) loader.style.display = 'none';
-
-    // 4. Обработка результата
-    if (sendSuccess) {
+        // Если GAS сработал - просто завершаем
         const modal = document.getElementById('successModal');
         if (modal) {
             modal.style.display = 'flex';
             setTimeout(() => modal.style.display = 'none', 3000);
         }
         
-        // Очищаем форму
         document.getElementById("address").value = "";
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
-    } else {
-        alert("Произошла ошибка. Пожалуйста, позвоните нам напрямую.");
+        
+    } catch (error) {
+        console.log("Ошибка GAS, пробуем Telegram (однократно)");
+        
+        // 2. Проверяем, не отправляли ли мы уже это в Telegram
+        const lastId = localStorage.getItem('lastSubmissionId');
+        if (lastId === submissionId) {
+            try {
+                await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
+                    encodeURIComponent(`📌 Заявка\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
+                }`);
+                
+                const modal = document.getElementById('successModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    setTimeout(() => modal.style.display = 'none', 3000);
+                }
+                
+                document.getElementById("address").value = "";
+                document.getElementById("name").value = "";
+                document.getElementById("phone").value = "";
+            } catch (e) {
+                console.error("Ошибка Telegram:", e);
+                alert("Произошла ошибка. Пожалуйста, позвоните нам напрямую.");
+            }
+        }
+    } finally {
+        if (loader) loader.style.display = 'none';
     }
 }
 
