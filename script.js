@@ -1,7 +1,7 @@
 let currentIndex = 0;
 const cards = document.querySelectorAll('.tariff');
 
-// Функции для переключения тарифов (оставляем без изменений)
+// Функции для переключения тарифов (без изменений)
 function showCard(index) {
     const isMobile = window.innerWidth <= 768;
     const cardsToShow = isMobile ? 1 : 3;
@@ -44,7 +44,7 @@ function selectTariff(tariff, discount, description) {
     }
 }
 
-// Проверка доступности GAS (оставляем без изменений)
+// Проверка доступности GAS (без изменений)
 async function checkGASAccess() {
     try {
         const testResponse = await fetch('https://script.google.com/macros/s/AKfycbxVXWpL5p0Bt9-pEzcTUcnybKa1eKzcLMfSK_te4zFV3UhY-krE0G0-XO_4g9s1IENybw/exec?ping=1', {
@@ -57,7 +57,7 @@ async function checkGASAccess() {
     }
 }
 
-// ФИНАЛЬНАЯ ВЕРСИЯ ФУНКЦИИ ОТПРАВКИ ФОРМЫ
+// ИСПРАВЛЕННАЯ функция отправки формы (без дублирования в Telegram)
 async function submitForm(event) {
     event.preventDefault();
     
@@ -68,11 +68,11 @@ async function submitForm(event) {
         phone: document.getElementById("phone").value
     };
 
-    // Показываем loader
     const loader = document.getElementById('loader');
     if (loader) loader.style.display = 'block';
 
     let sendSuccess = false;
+    let telegramSent = false; // Флаг для контроля однократной отправки в Telegram
 
     try {
         // 1. Пытаемся отправить через GAS (основной способ)
@@ -88,25 +88,26 @@ async function submitForm(event) {
             sendSuccess = true;
         }
     } catch (error) {
-        console.log("Ошибка GAS (ожидаемо, пробуем Telegram)");
+        console.log("Ошибка GAS, пробуем Telegram");
     }
 
-    // 2. Если GAS не сработал, пробуем Telegram
-    if (!sendSuccess) {
+    // 2. Если GAS не сработал и Telegram еще не отправлялся
+    if (!sendSuccess && !telegramSent) {
         try {
             await fetch(`https://api.telegram.org/bot7628185270:AAEeK69bRl6iKxlQIApVRcV9RUsutuNSMAA/sendMessage?chat_id=968338148&text=${
                 encodeURIComponent(`📌 Заявка\nТариф: ${formData.tariff}\nАдрес: ${formData.address}\nИмя: ${formData.name}\nТелефон: ${formData.phone}`)
             }`);
             sendSuccess = true;
+            telegramSent = true; // Помечаем, что Telegram уже отправлен
         } catch (error) {
             console.error("Ошибка Telegram:", error);
         }
     }
 
-    // 3. В любом случае скрываем loader
+    // 3. Всегда скрываем loader
     if (loader) loader.style.display = 'none';
 
-    // 4. Если хотя бы один способ сработал - показываем успех
+    // 4. Обработка результата
     if (sendSuccess) {
         const modal = document.getElementById('successModal');
         if (modal) {
@@ -119,16 +120,16 @@ async function submitForm(event) {
         document.getElementById("name").value = "";
         document.getElementById("phone").value = "";
     } else {
-        // ТОЛЬКО если оба способа не сработали - показываем ошибку
         alert("Произошла ошибка. Пожалуйста, позвоните нам напрямую.");
     }
 }
 
-// Закрытие модального окна (оставляем без изменений)
+// Закрытие модального окна (без изменений)
 document.querySelector('.close').addEventListener('click', () => {
     document.getElementById('successModal').style.display = 'none';
 });
 
-// Инициализация (оставляем без изменений)
+// Инициализация (без изменений)
 showCard(currentIndex);
 checkGASAccess();
+
